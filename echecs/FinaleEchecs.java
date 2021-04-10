@@ -1,17 +1,24 @@
 package echecs;
 
-import pieces.Piece;
-
-import java.awt.*;
+import pieces.*;
 
 public class FinaleEchecs {
     private static final int LONGUEUR = 8;
-    public final IPiece[][] damier = new Piece[LONGUEUR][LONGUEUR];
+    private final IPiece[][] damier = new Piece[LONGUEUR][LONGUEUR];
+
+    private final Joueur blanc = new Joueur(CouleurJoueur.BLANC);
+    private final Joueur noir = new Joueur(CouleurJoueur.NOIR);
+
+    private Joueur courant = blanc;
 
     public FinaleEchecs() {
         for (int i = 0; i < LONGUEUR; ++i)
             for (int j = 0; j < LONGUEUR; ++j)
-                damier[i][j] = new Piece();
+                damier[i][j] = new Piece(this.courant);
+        // TODO initialiser pièces
+        damier[7][4] = new Roi(noir);
+        damier[6][1] = new Tour(blanc);
+        damier[5][4] = new Roi(blanc);
     }
 
     @Override

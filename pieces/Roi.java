@@ -1,8 +1,17 @@
 package pieces;
 
+import echecs.Joueur;
+
 public class Roi extends Piece {
-    @Override
-    public String toString() {
-        return "R";
+    private static final String SYMBOLE = "R";
+
+    public Roi(Joueur joueur) {
+        super(joueur);
     }
+
+    @Override
+    public String getSymbole() {
+        return SYMBOLE;
+    }
+
 }

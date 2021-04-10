@@ -12,10 +12,7 @@ public class FinaleEchecs {
     private Joueur courant = blanc;
 
     public FinaleEchecs() {
-        for (int i = 0; i < LONGUEUR; ++i)
-            for (int j = 0; j < LONGUEUR; ++j)
-                damier[i][j] = new Piece(this.courant);
-        // TODO initialiser pièces
+        // changer l'initialisation des pièces ?
         damier[7][4] = new Roi(noir);
         damier[6][1] = new Tour(blanc);
         damier[5][4] = new Roi(blanc);
@@ -32,8 +29,13 @@ public class FinaleEchecs {
 
         for (int i = LONGUEUR - 1; i >= 0; --i) {
             sb.append(i + 1);
-            for (int j = 0; j < LONGUEUR; ++j)
-                sb.append(" | ").append(damier[i][j]);
+            for (int j = 0; j < LONGUEUR; ++j) {
+                sb.append(" | ");
+                if (damier[i][j] == null)
+                    sb.append(" ");
+                else
+                    sb.append(damier[i][j]);
+            }
             sb.append(" | ").append(i + 1).append(newLine);
             sb.append(separateur).append(newLine);
         }

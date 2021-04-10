@@ -4,8 +4,7 @@ import echecs.CouleurJoueur;
 import echecs.IPiece;
 import echecs.Joueur;
 
-public class Piece implements IPiece {
-    private static final String SYMBOLE = " ";
+public abstract class Piece implements IPiece {
 
     private final Joueur joueur;
 
@@ -18,9 +17,7 @@ public class Piece implements IPiece {
     }
 
     @Override
-    public String getSymbole() {
-        return SYMBOLE;
-    }
+    public abstract String getSymbole();
 
     @Override
     public String toString() {

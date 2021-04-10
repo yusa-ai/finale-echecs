@@ -12,12 +12,12 @@ public abstract class Piece implements IPiece {
         this.joueur = joueur;
     }
 
+    public abstract String getSymbole();
+
+    @Override
     public Joueur getJoueur() {
         return joueur;
     }
-
-    @Override
-    public abstract String getSymbole();
 
     @Override
     public String toString() {

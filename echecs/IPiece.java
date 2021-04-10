@@ -1,6 +1,6 @@
 package echecs;
 
 public interface IPiece {
-    String getSymbole();
+    Joueur getJoueur();
     String toString();
 }

@@ -1,6 +1,8 @@
 package echecs;
 
-public interface IPiece {
+public interface IPièce {
     Joueur getJoueur();
+    int getX();
+    int getY();
     String toString();
 }

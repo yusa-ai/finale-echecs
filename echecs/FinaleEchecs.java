@@ -10,7 +10,7 @@ public class FinaleEchecs {
 
     private final List<IPièce> pièces = new ArrayList<>();
 
-    //Todo : faire une fabrique
+    // TODO : rendre le paquetage stable (ajouter des fabriques, déplacer les classes pour joueurs)
     private final Joueur blanc = new Joueur(CouleurJoueur.BLANC);
     private final Joueur noir = new Joueur(CouleurJoueur.NOIR);
 

@@ -1,6 +1,8 @@
-package echecs;
+package joueurs;
 
-public class Joueur {
+import echecs.IJoueur;
+
+public class Joueur implements IJoueur {
 
     private final CouleurJoueur couleur;
 

@@ -1,7 +1,7 @@
 package echecs;
 
 public interface IPièce {
-    Joueur getJoueur();
+    IJoueur getJoueur();
     int getX();
     int getY();
     String toString();

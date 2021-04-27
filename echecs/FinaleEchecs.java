@@ -1,7 +1,5 @@
 package echecs;
 
-import pieces.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,17 +8,19 @@ public class FinaleEchecs {
 
     private final List<IPièce> pièces = new ArrayList<>();
 
-    // TODO : rendre le paquetage stable (ajouter des fabriques, déplacer les classes pour joueurs)
-    private final Joueur blanc = new Joueur(CouleurJoueur.BLANC);
-    private final Joueur noir = new Joueur(CouleurJoueur.NOIR);
+    private final IJoueur blanc;
+    private final IJoueur noir;
 
-    private Joueur courant = blanc;
+    private IJoueur courant;
 
-    public FinaleEchecs() {
-        // changer l'initialisation des pièces ?
-        pièces.add(new Roi(noir, 7, 4));
-        pièces.add(new Roi(blanc, 6, 1));
-        pièces.add(new Roi(blanc, 5, 4));
+    public FinaleEchecs(IFabriquePièce fPièce, IFabriqueJoueur fJoueur) {
+        blanc = fJoueur.getJoueur("BLANC");
+        noir = fJoueur.getJoueur("NOIR");
+        courant = blanc;
+
+        pièces.add(fPièce.getPièce("ROI", noir, 7, 4));
+        pièces.add(fPièce.getPièce("TOUR", blanc, 6, 1));
+        pièces.add(fPièce.getPièce("ROI", blanc, 5, 4));
     }
 
     private IPièce chercherPièce(int x, int y)  {

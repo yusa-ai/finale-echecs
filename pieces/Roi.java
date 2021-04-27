@@ -1,11 +1,11 @@
 package pieces;
 
-import echecs.Joueur;
+import echecs.IJoueur;
 
 public class Roi extends Pièce {
     private static final String SYMBOLE = "R";
 
-    public Roi(Joueur joueur, int x, int y) {
+    public Roi(IJoueur joueur, int x, int y) {
         super(joueur, x, y);
     }
 

@@ -1,11 +1,11 @@
 package pieces;
 
-import echecs.Joueur;
+import echecs.IJoueur;
 
 public class Tour extends Pièce {
     private static final String SYMBOLE = "T";
 
-    public Tour(Joueur joueur, int x, int y) {
+    public Tour(IJoueur joueur, int x, int y) {
         super(joueur, x, y);
     }
 

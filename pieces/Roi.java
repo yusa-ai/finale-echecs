@@ -5,8 +5,8 @@ import echecs.IJoueur;
 public class Roi extends Pièce {
     private static final String SYMBOLE = "R";
 
-    public Roi(IJoueur joueur, int x, int y) {
-        super(joueur, x, y);
+    public Roi(IJoueur joueur, int y, int x) {
+        super(joueur, y, x);
     }
 
     @Override

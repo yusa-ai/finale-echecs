@@ -5,8 +5,8 @@ import echecs.IJoueur;
 public class Tour extends Pièce {
     private static final String SYMBOLE = "T";
 
-    public Tour(IJoueur joueur, int x, int y) {
-        super(joueur, x, y);
+    public Tour(IJoueur joueur, int y, int x) {
+        super(joueur, y, x);
     }
 
     @Override

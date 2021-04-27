@@ -18,16 +18,20 @@ public class FinaleEchecs {
         noir = fJoueur.getJoueur("NOIR");
         courant = blanc;
 
-        pièces.add(fPièce.getPièce("ROI", noir, 7, 4));
-        pièces.add(fPièce.getPièce("TOUR", blanc, 6, 1));
-        pièces.add(fPièce.getPièce("ROI", blanc, 5, 4));
+        pièces.add(fPièce.getPièce("ROI", noir, 4, 7));
+        pièces.add(fPièce.getPièce("TOUR", blanc, 1, 6));
+        pièces.add(fPièce.getPièce("ROI", blanc, 4, 5));
     }
 
-    private IPièce chercherPièce(int x, int y)  {
+    public IPièce occupante(int y, int x)  {
         for (IPièce pièce : pièces)
-            if (pièce.getX() == x && pièce.getY() == y)
+            if (pièce.getY() == y && pièce.getX() == x)
                 return pièce;
         return null;
+    }
+
+    public IJoueur getCourant() {
+        return courant;
     }
 
     @Override
@@ -44,8 +48,7 @@ public class FinaleEchecs {
             sb.append(i + 1);
             for (int j = 0; j < LONGUEUR; ++j) {
                 sb.append(" | ");
-                // TODO trouver mieux ?
-                IPièce pièce = chercherPièce(i, j);
+                IPièce pièce = occupante(j, i);
                 if (pièce == null)
                     sb.append(" ");
                 else
@@ -57,4 +60,5 @@ public class FinaleEchecs {
         sb.append(lettres);
         return sb.toString();
     }
+
 }

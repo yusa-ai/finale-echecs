@@ -10,7 +10,7 @@ public abstract class Pièce implements IPièce {
     private int x;
     private int y;
 
-    public Pièce(IJoueur joueur, int x, int y) {
+    public Pièce(IJoueur joueur, int y, int x) {
         this.joueur = joueur;
         this.x = x;
         this.y = y;

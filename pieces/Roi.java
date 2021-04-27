@@ -14,4 +14,8 @@ public class Roi extends Pièce {
         return SYMBOLE;
     }
 
+    @Override
+    public boolean craintMat() {
+        return true;
+    }
 }

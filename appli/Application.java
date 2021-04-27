@@ -5,16 +5,12 @@ import echecs.IPièce;
 import joueurs.FabriqueJoueur;
 import pieces.FabriquePièce;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Application {
     public static void main(String[] args) {
         FabriquePièce fPièce = new FabriquePièce();
         FabriqueJoueur fJoueur = new FabriqueJoueur();
-
         FinaleEchecs fe = new FinaleEchecs(fPièce, fJoueur);
 
         Scanner sc = new Scanner(System.in);
@@ -45,43 +41,46 @@ public class Application {
 
     private static boolean formatValide(String saisie) {
         final int TAILLE = 4;
-        // Sans tenir compte de la casse, une lettre de A à H puis un chiffre de 1 à 8, deux fois
+        // REGEX: Sans tenir compte de la casse, une lettre de A à H puis un chiffre de 1 à 8, deux fois
         final String FORMAT = "(?i)([a-h][1-8]){2}";
 
         return (saisie.length() == TAILLE && saisie.matches(FORMAT));
     }
 
     private static boolean coupLégal(FinaleEchecs fe, String saisie) {
-        final List<Character> LETTRES = new ArrayList<>(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'));
+        final List<Character> LETTRES =
+                new ArrayList<>(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'));
 
-        char[] coup = saisie.toCharArray();
-        int ySrc = LETTRES.indexOf(coup[0]);
-        int xSrc = Character.getNumericValue(coup[1]) - 1;
-        int yDest = LETTRES.indexOf(coup[2]); // TODO trouver mieux?
-        int xDest = Character.getNumericValue(coup[3]) - 1;
+        String s = saisie.toLowerCase();
+        int ySrc = LETTRES.indexOf(s.charAt(0)); // on traduit la lettre par sa coordonnée y
+        int xSrc = Character.getNumericValue(s.charAt(1)) - 1;
+        int yDest = LETTRES.indexOf(s.charAt(2));
+        int xDest = Character.getNumericValue(s.charAt(3)) - 1;
 
-        // Regarder si la source et la destination sont les mêmes positions
+        // La source et la destination sont deux positions distinctes
         if (ySrc == yDest && xSrc == xDest)
             return false;
 
-        // Regarder s'il y a une pièce à la case de départ
+        // Il y a une pièce sur la case de départ
         IPièce pièce = fe.occupante(ySrc, xSrc);
         if (pièce == null)
             return false;
 
-        // Regarder si la pièce appartient au joueur
+        // La pièce appartient au joueur
         if (pièce.getJoueur() != fe.getCourant())
             return false;
 
-        // Regarder si la pièce peut se déplacer à la destination
+        // La pièce peut se déplacer à la destination
+
 
         // Si la pièce est un Roi... (fonction à part peut-être ?)
             // Si le Roi est mis en échec en se déplaçant à la dest, return false
+            // (pour ça, itérer à travers toutes les pièces adverses et regarder si l'une d'elles peut attaquer la position d'arrivée)
+
             // Si
 
 
-
-        return false;
+        return true;
     }
 
     private static void jouer(FinaleEchecs fe, String saisie) {

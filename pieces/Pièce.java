@@ -34,6 +34,11 @@ public abstract class Pièce implements IPièce {
     }
 
     @Override
+    public boolean craintMat() {
+        return false;
+    }
+
+    @Override
     public String toString() {
         if (getJoueur().getCouleur() == CouleurJoueur.BLANC)
             return getSymbole().toUpperCase();

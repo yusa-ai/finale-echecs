@@ -21,6 +21,7 @@ public class FinaleEchecs {
         pièces.add(fPièce.getPièce("ROI", noir, 4, 7));
         pièces.add(fPièce.getPièce("TOUR", blanc, 1, 6));
         pièces.add(fPièce.getPièce("ROI", blanc, 4, 5));
+        pièces.add(fPièce.getPièce("TOUR", noir, 7, 5));
     }
 
     public IPièce occupante(int y, int x)  {

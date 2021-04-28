@@ -62,15 +62,14 @@ public class Application {
     }
 
     private static boolean finPartie(FinaleEchecs fe) {
-        if (fe.pat()) {
-            System.out.println("");
-            System.out.println("");
+        if (fe.mat()) {
+            System.out.println("Echec et mat !");
+            System.out.println("Le joueur " + fe.getPrécédent().getCouleur() + " remporte la partie !");
             return true;
         }
 
-        if (fe.mat()) {
-            System.out.println("");
-            System.out.println("");
+        if (fe.pat()) {
+            System.out.println("Pat détecté ! Match nul.");
             return true;
         }
 

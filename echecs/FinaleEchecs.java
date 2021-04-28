@@ -20,9 +20,13 @@ public class FinaleEchecs {
         courant = blanc;
 
         pièces.add(fPièce.getPièce("ROI", noir, toY('e'), toX('8')));
-        pièces.add(fPièce.getPièce("TOUR", blanc, toY('f'), toX('7'))); //b7
+        pièces.add(fPièce.getPièce("TOUR", blanc, toY('b'), toX('7')));
         pièces.add(fPièce.getPièce("ROI", blanc, toY('e'), toX('6')));
         pièces.add(fPièce.getPièce("TOUR", noir, toY('h'), toX('6')));
+
+        /*pièces.add(fPièce.getPièce("roi", noir, toY('a'), toX('8')));
+        pièces.add(fPièce.getPièce("roi", blanc, toY('a'), toX('6')));
+        pièces.add(fPièce.getPièce("tour", blanc, toY('b'), toX('6')));*/ // b6 pour pat, c8 pour mat
     }
 
     public static boolean formatValide(String saisie) {
@@ -75,16 +79,8 @@ public class FinaleEchecs {
     }
 
     public boolean roiEnEchec() {
-        // On récupère le roi du joueur courant
-        for (IPièce pièce : pièces)
-            if (pièce.getJoueur() == courant && pièce.craintEchec()) {
-                // On regarde si le roi est en échec à sa position actuelle
-                if (échecSurPosition(pièce.getY(), pièce.getX()))
-                    return true;
-                else
-                    break;
-            }
-        return false;
+        IPièce roi = roiCourant();
+        return échecSurPosition(roi.getY(), roi.getX());
     }
 
     private IPièce roiCourant() {
@@ -150,6 +146,12 @@ public class FinaleEchecs {
         return courant;
     }
 
+    public IJoueur getPrécédent() {
+        if (courant == blanc)
+            return noir;
+        return blanc;
+    }
+
     public static int toY(char lettre) {
         final List<Character> LETTRES =
                 new ArrayList<>(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'));
@@ -189,11 +191,40 @@ public class FinaleEchecs {
     }
 
     public boolean pat() {
+        IPièce roi = roiCourant();
+        int rx = roi.getX();
+        int ry = roi.getY();
 
+        // On vérifie si le roi est en échec sur les 8 cases autour de lui
+        for (int x = rx + 1; x >= rx - 1; --x) {
+            for (int y = ry - 1; y <= ry + 1; ++y) {
+                if (y < 0 || x < 0 || y > LONGUEUR - 1 || x > LONGUEUR - 1)
+                    continue;
 
-        boolean roiCoincé;
+                if (y == ry && x == rx)
+                    continue;
 
+                if (!échecSurPosition(y, x))
+                    return false;
+            }
+        }
 
-        return false;
+        // Le roi est bloqué : on regarde si les autres pièces peuvent le protéger
+        for (IPièce pièce : pièces)
+            if (pièce.getJoueur() == courant && !pièce.craintEchec()) {
+                // On essaie de déplacer chaque autre pièce du joueur sur toutes les cases de l'échiquier
+                for (int y = 0; y < LONGUEUR; ++y)
+                    for (int x = 0; x < LONGUEUR; ++x) {
+                        if (pièce.peutAllerEn(y, x, this) && pièce.trajectoireLibre(y, x, this))
+                            if (coupDébloqueRoi(pièce.getY(), pièce.getX(), y, x))
+                                return false;
+                    }
+            }
+
+        return true;
+    }
+
+    public boolean mat() {
+        return pat() && roiEnEchec();
     }
 }

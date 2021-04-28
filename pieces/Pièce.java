@@ -1,5 +1,6 @@
 package pieces;
 
+import echecs.FinaleEchecs;
 import echecs.IJoueur;
 import joueurs.CouleurJoueur;
 import echecs.IPièce;
@@ -34,9 +35,21 @@ public abstract class Pièce implements IPièce {
     }
 
     @Override
-    public boolean craintMat() {
+    public void déplacer(int yDest, int xDest) {
+        y = yDest;
+        x = xDest;
+    }
+
+    @Override
+    public boolean craintEchec() {
         return false;
     }
+
+    @Override
+    public abstract boolean peutAllerEn(int yDest, int xDest, FinaleEchecs fe);
+
+    @Override
+    public abstract boolean trajectoireLibre(int yDest, int xDest, FinaleEchecs fe);
 
     @Override
     public String toString() {

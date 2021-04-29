@@ -15,17 +15,17 @@ public class FinaleEchecs {
 
     public FinaleEchecs(IFabriquePièce fPièce, IFabriqueJoueur fJoueur, int mode) {
         switch (mode) {
-            case 1:
-                blanc = fJoueur.getJoueur("BLANC", "HUMAIN");
-                noir = fJoueur.getJoueur("NOIR", "HUMAIN");
-                break;
             case 2:
                 blanc = fJoueur.getJoueur("BLANC", "HUMAIN");
                 noir = fJoueur.getJoueur("NOIR", "IA");
                 break;
-            default:
+            case 3:
                 blanc = fJoueur.getJoueur("BLANC", "IA");
                 noir = fJoueur.getJoueur("NOIR", "IA");
+                break;
+            default:
+                blanc = fJoueur.getJoueur("BLANC", "HUMAIN");
+                noir = fJoueur.getJoueur("NOIR", "HUMAIN");
         }
         courant = blanc;
 
@@ -260,14 +260,8 @@ public class FinaleEchecs {
         }
     }
 
-    public IJoueur getCourant() {
-        return courant;
-    }
-
-    public IJoueur getPrécédent() {
-        if (courant == blanc)
-            return noir;
-        return blanc;
+    public boolean contreIA() {
+        return !noir.estHumain();
     }
 
     public static int toY(char lettre) {
@@ -279,6 +273,16 @@ public class FinaleEchecs {
 
     public static int toX(char chiffre) {
         return Character.getNumericValue(chiffre) - 1;
+    }
+
+    public IJoueur getCourant() {
+        return courant;
+    }
+
+    public IJoueur getPrécédent() {
+        if (courant == blanc)
+            return noir;
+        return blanc;
     }
 
     @Override

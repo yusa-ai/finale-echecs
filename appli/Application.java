@@ -43,9 +43,16 @@ public class Application {
                 System.out.println("Attention, votre roi est en échec !");
             System.out.println("#####################################");
 
-            // Si le joueur courant est HUMAIN
-            if (fe.getCourant().estHumain())
-                jouerHumain(fe, roiEnEchec, sc);
+            if (fe.getCourant().estHumain()) {
+                String saisie;
+                saisie = sc.nextLine();
+
+                if (abandon(fe, sc, saisie)) break;
+                if (saisie.equalsIgnoreCase("ABANDONNER") || saisie.equalsIgnoreCase("NULLE"))
+                    saisie = sc.nextLine(); // demander un coup
+
+                jouerHumain(fe, roiEnEchec, sc, saisie);
+            }
             else
                 fe.jouerIA();
 
@@ -55,12 +62,43 @@ public class Application {
         sc.close();
     }
 
-    private static void jouerHumain(FinaleEchecs fe, boolean roiEnEchec, Scanner sc) {
-        String saisie;
+    private static boolean abandon(FinaleEchecs fe, Scanner sc, String saisie) {
+        if (saisie.equalsIgnoreCase("ABANDONNER")) {
+            System.out.println("Le joueur " + fe.getCourant().getCouleur() + " abandonne la partie !");
+            return true;
+        }
+        if (saisie.equalsIgnoreCase("NULLE")) {
+            System.out.println("Le joueur " + fe.getCourant().getCouleur() + " propose un match nul.");
+
+            if (fe.contreIA()) {
+                System.out.println("L'IA accepte. Match nul.");
+                return true;
+            }
+
+            System.out.println("Acceptez-vous ? (O/N)");
+            String réponse = "";
+            while (!réponse.equalsIgnoreCase("O") && !réponse.equalsIgnoreCase("N")) {
+                System.out.print("Réponse : ");
+                while (!sc.hasNextLine()) {
+                    System.out.print("Réponse : ");
+                    sc.nextLine();
+                }
+                réponse = sc.nextLine();
+            }
+            if (réponse.equalsIgnoreCase("O"))
+                return true;
+            else {
+                System.out.println("La partie continue.");
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private static void jouerHumain(FinaleEchecs fe, boolean roiEnEchec, Scanner sc, String saisie) {
         boolean formatValide;
         int ySrc = 0, xSrc = 0, yDest = 0, xDest = 0;
         do {
-            saisie = sc.nextLine();
             formatValide = FinaleEchecs.formatValide(saisie);
             if (formatValide) {
                 String s = saisie.toLowerCase();
@@ -82,8 +120,10 @@ public class Application {
                         System.out.println("Vous devez absolument débloquer votre roi !");
                 }
             }
-            else
+            else {
                 System.out.println("Le format de la saisie est incorrect !");
+                saisie = sc.nextLine();
+            }
         }
         while (!formatValide || roiEnEchec);
 

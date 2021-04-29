@@ -1,8 +1,7 @@
 package echecs;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import javafx.util.Pair;
+import java.util.*;
 
 public class FinaleEchecs {
     private static final int LONGUEUR = 8;
@@ -14,9 +13,20 @@ public class FinaleEchecs {
 
     private IJoueur courant;
 
-    public FinaleEchecs(IFabriquePièce fPièce, IFabriqueJoueur fJoueur) {
-        blanc = fJoueur.getJoueur("BLANC");
-        noir = fJoueur.getJoueur("NOIR");
+    public FinaleEchecs(IFabriquePièce fPièce, IFabriqueJoueur fJoueur, int mode) {
+        switch (mode) {
+            case 1:
+                blanc = fJoueur.getJoueur("BLANC", "HUMAIN");
+                noir = fJoueur.getJoueur("NOIR", "HUMAIN");
+                break;
+            case 2:
+                blanc = fJoueur.getJoueur("BLANC", "HUMAIN");
+                noir = fJoueur.getJoueur("NOIR", "IA");
+                break;
+            default:
+                blanc = fJoueur.getJoueur("BLANC", "IA");
+                noir = fJoueur.getJoueur("NOIR", "IA");
+        }
         courant = blanc;
 
         pièces.add(fPièce.getPièce("ROI", noir, toY('e'), toX('8')));
@@ -80,6 +90,7 @@ public class FinaleEchecs {
 
     public boolean roiEnEchec() {
         IPièce roi = roiCourant();
+        assert roi != null;
         return échecSurPosition(roi.getY(), roi.getX());
     }
 
@@ -113,19 +124,14 @@ public class FinaleEchecs {
     }
 
     public void jouer(int ySrc, int xSrc, int yDest, int xDest) {
-        IPièce pièce;
-        for (int i = 0; i < pièces.size(); ++i) {
-            pièce = pièces.get(i);
+        // S'il y a une pièce (adverse) à la destination, la retirer du plateau (elle est mangée)
+        pièces.removeIf(pièce -> pièce.getY() == yDest && pièce.getX() == xDest);
 
-            // S'il y a une pièce (adverse) à la destination, la retirer du plateau (elle est mangée)
-            if (pièce.getY() == yDest && pièce.getX() == xDest)
-                pièces.remove(i);
-
+        for (IPièce pièce : pièces) {
             // Déplacer la pièce à la case de départ sur la case d'arrivée
             if (pièce.getY() == ySrc && pièce.getX() == xSrc)
                 pièce.déplacer(yDest, xDest);
         }
-
     }
 
     public IPièce occupante(int y, int x)  {
@@ -140,6 +146,118 @@ public class FinaleEchecs {
             courant = noir;
         else
             courant = blanc;
+    }
+
+    public boolean nulle() {
+        final int NB_ROIS = 2;
+        if (pièces.size() == NB_ROIS) {
+            for (IPièce pièce : pièces)
+                if (!pièce.craintEchec())
+                    return false;
+        }
+        else {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean pat() {
+        IPièce roi = roiCourant();
+        assert roi != null;
+        int rx = roi.getX();
+        int ry = roi.getY();
+
+        // On vérifie si le roi est en échec sur les 8 cases autour de lui
+        for (int x = rx + 1; x >= rx - 1; --x) {
+            for (int y = ry - 1; y <= ry + 1; ++y) {
+                if (y < 0 || x < 0 || y > LONGUEUR - 1 || x > LONGUEUR - 1)
+                    continue;
+
+                if (y == ry && x == rx)
+                    continue;
+
+                if (!échecSurPosition(y, x))
+                    return false;
+            }
+        }
+
+        // Le roi est bloqué : on regarde si les autres pièces peuvent le protéger
+        for (IPièce pièce : pièces)
+            if (pièce.getJoueur() == courant && !pièce.craintEchec()) {
+                // On essaie de déplacer chaque autre pièce du joueur sur toutes les cases de l'échiquier
+                for (int y = 0; y < LONGUEUR; ++y)
+                    for (int x = 0; x < LONGUEUR; ++x) {
+                        if (pièce.peutAllerEn(y, x, this) && pièce.trajectoireLibre(y, x, this))
+                            if (coupDébloqueRoi(pièce.getY(), pièce.getX(), y, x))
+                                return false;
+                    }
+            }
+
+        return true;
+    }
+
+    public boolean mat() {
+        return pat() && roiEnEchec();
+    }
+
+    public void jouerIA() {
+        assert !courant.estHumain() : "Le joueur courant est humain.";
+
+        Random r = new Random();
+        List<IPièce> piècesIA = new ArrayList<>();
+        for (IPièce pièce : pièces) // on récupère les pièces de l'IA
+            if (pièce.getJoueur() == courant)
+                piècesIA.add(pièce);
+
+        int position;
+        IPièce choix;
+
+        List<Pair<Integer, Integer>> coords;
+
+        int yDest, xDest;
+        IPièce pièceSurDest;
+
+        while (true) {
+            // On prend une pièce au hasard, qu'on va essayer de jouer
+            position = r.nextInt(piècesIA.size());
+            choix = piècesIA.get(position);
+            piècesIA.remove(position);
+
+            coords = new ArrayList<>();
+            for (int i = 0; i < LONGUEUR; ++i)
+                for (int j = 0; j < LONGUEUR; ++j)
+                    coords.add(new Pair<>(i, j));
+            Collections.shuffle(coords);
+            // On va tester chacune des coords de l'échiquier dans un ordre aléatoire
+            while (!coords.isEmpty()) {
+                yDest = coords.get(0).getKey();
+                xDest = coords.get(0).getValue();
+                coords.remove(0);
+
+                // Surplace
+                if (choix.getY() == yDest && choix.getX() == xDest) continue;
+
+                // Pièce alliée sur la destination
+                pièceSurDest = occupante(yDest, xDest);
+                if (pièceSurDest != null && pièceSurDest.getJoueur() == courant) continue;
+
+                if (choix.peutAllerEn(yDest, xDest, this) && choix.trajectoireLibre(yDest, xDest, this)) {
+
+                    // Le roi ne peut pas se mettre en échec
+                    if (choix.craintEchec() && échecSurPosition(yDest, xDest)) continue;
+
+                    if (!roiEnEchec() || // si le roi n'est pas en échec
+                            // ou si le roi est en échec mais que le coup le débloque
+                            roiEnEchec() && coupDébloqueRoi(choix.getY(), choix.getX(), yDest, xDest)) {
+                        System.out.println("(" + choix.getY() + "," + choix.getX() + ") -> (" + yDest + "," + xDest + ")"); // TODO remove ou implémenter d'une autre manière
+
+                        jouer(choix.getY(), choix.getX(), yDest, xDest);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     public IJoueur getCourant() {
@@ -188,43 +306,5 @@ public class FinaleEchecs {
         }
         sb.append(lettres);
         return sb.toString();
-    }
-
-    public boolean pat() {
-        IPièce roi = roiCourant();
-        int rx = roi.getX();
-        int ry = roi.getY();
-
-        // On vérifie si le roi est en échec sur les 8 cases autour de lui
-        for (int x = rx + 1; x >= rx - 1; --x) {
-            for (int y = ry - 1; y <= ry + 1; ++y) {
-                if (y < 0 || x < 0 || y > LONGUEUR - 1 || x > LONGUEUR - 1)
-                    continue;
-
-                if (y == ry && x == rx)
-                    continue;
-
-                if (!échecSurPosition(y, x))
-                    return false;
-            }
-        }
-
-        // Le roi est bloqué : on regarde si les autres pièces peuvent le protéger
-        for (IPièce pièce : pièces)
-            if (pièce.getJoueur() == courant && !pièce.craintEchec()) {
-                // On essaie de déplacer chaque autre pièce du joueur sur toutes les cases de l'échiquier
-                for (int y = 0; y < LONGUEUR; ++y)
-                    for (int x = 0; x < LONGUEUR; ++x) {
-                        if (pièce.peutAllerEn(y, x, this) && pièce.trajectoireLibre(y, x, this))
-                            if (coupDébloqueRoi(pièce.getY(), pièce.getX(), y, x))
-                                return false;
-                    }
-            }
-
-        return true;
-    }
-
-    public boolean mat() {
-        return pat() && roiEnEchec();
     }
 }

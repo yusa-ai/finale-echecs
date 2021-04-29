@@ -4,13 +4,20 @@ import echecs.IFabriqueJoueur;
 import echecs.IJoueur;
 
 public class FabriqueJoueur implements IFabriqueJoueur {
-    public IJoueur getJoueur(String couleur) {
-        if (couleur == null)
+    public IJoueur getJoueur(String couleur, String type) {
+        if (couleur == null || type == null)
             return null;
+
+        CouleurJoueur c = null;
         if (couleur.equalsIgnoreCase("BLANC"))
-            return new Joueur(CouleurJoueur.BLANC);
-        if (couleur.equalsIgnoreCase("NOIR"))
-            return new Joueur(CouleurJoueur.NOIR);
+            c = CouleurJoueur.BLANC;
+        else if (couleur.equalsIgnoreCase("NOIR"))
+            c = CouleurJoueur.NOIR;
+
+        if (type.equalsIgnoreCase("HUMAIN"))
+            return new Joueur(c, TypeJoueur.HUMAIN);
+        else if (type.equalsIgnoreCase("IA"))
+            return new Joueur(c, TypeJoueur.IA);
         return null;
     }
 }

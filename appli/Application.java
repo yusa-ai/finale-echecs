@@ -7,7 +7,7 @@ import pieces.FabriquePièce;
 import java.util.*;
 
 public class Application {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         FabriquePièce fPièce = new FabriquePièce();
         FabriqueJoueur fJoueur = new FabriqueJoueur();
 
@@ -30,9 +30,13 @@ public class Application {
         sc.nextLine(); // flush
 
         FinaleEchecs fe = new FinaleEchecs(fPièce, fJoueur, mode);
+        if (mode == 1 || mode == 2) {
+            System.out.println("Dans les modes 1 et 2, vous pouvez abandonner ou faire une proposition de nulle");
+            System.out.println("au début de votre tour en tapant \"abandonner\" ou \"nulle\" respectivement.");
+        }
 
         while (true) {
-            System.out.println("#####################################");
+            System.out.println("_____________________________________");
             System.out.println(fe);
             System.out.println("Le joueur " + fe.getCourant().getCouleur() + " a le trait");
 
@@ -41,7 +45,7 @@ public class Application {
             boolean roiEnEchec = fe.roiEnEchec();
             if (roiEnEchec)
                 System.out.println("Attention, votre roi est en échec !");
-            System.out.println("#####################################");
+            System.out.println("_____________________________________");
 
             if (fe.getCourant().estHumain()) {
                 String saisie;
@@ -51,13 +55,14 @@ public class Application {
                 if (saisie.equalsIgnoreCase("ABANDONNER") || saisie.equalsIgnoreCase("NULLE"))
                     saisie = sc.nextLine(); // demander un coup
 
-                jouerHumain(fe, roiEnEchec, sc, saisie);
+                jouerHumain(fe, sc, saisie);
             }
-            else
+            else {
                 fe.jouerIA();
+                System.out.println(fe.getCoupIA());
+            }
 
             fe.prochainTour();
-            Thread.sleep(250);
         }
         sc.close();
     }
@@ -71,7 +76,7 @@ public class Application {
             System.out.println("Le joueur " + fe.getCourant().getCouleur() + " propose un match nul.");
 
             if (fe.contreIA()) {
-                System.out.println("L'IA accepte. Match nul.");
+                System.out.println("L'IA accepte !!! ^-^ Match nul.");
                 return true;
             }
 
@@ -85,8 +90,10 @@ public class Application {
                 }
                 réponse = sc.nextLine();
             }
-            if (réponse.equalsIgnoreCase("O"))
+            if (réponse.equalsIgnoreCase("O")) {
+                System.out.println("Le joueur " + fe.getPrécédent().getCouleur() + " accepte le match nul !");
                 return true;
+            }
             else {
                 System.out.println("La partie continue.");
                 return false;
@@ -95,12 +102,10 @@ public class Application {
         return false;
     }
 
-    private static void jouerHumain(FinaleEchecs fe, boolean roiEnEchec, Scanner sc, String saisie) {
-        boolean formatValide;
+    private static void jouerHumain(FinaleEchecs fe, Scanner sc, String saisie) {
         int ySrc = 0, xSrc = 0, yDest = 0, xDest = 0;
         do {
-            formatValide = FinaleEchecs.formatValide(saisie);
-            if (formatValide) {
+            if (FinaleEchecs.formatValide(saisie)) {
                 String s = saisie.toLowerCase();
                 ySrc = FinaleEchecs.toY(s.charAt(0)); // on traduit la lettre par sa coordonnée y
                 xSrc = FinaleEchecs.toX(s.charAt(1));
@@ -109,23 +114,26 @@ public class Application {
 
                 if (!fe.coupLégal(ySrc, xSrc, yDest, xDest)) {
                     System.out.println("Le coup est illégal !");
-                    formatValide = false;
+                    saisie = sc.nextLine();
                 }
 
                 // Si le coup est légal et que le roi est en échec
-                else if (roiEnEchec) {
+                else if (fe.roiEnEchec()) {
                     if (fe.coupDébloqueRoi(ySrc, xSrc, yDest, xDest))
-                        roiEnEchec = false;
-                    else
+                        break;
+                    else {
                         System.out.println("Vous devez absolument débloquer votre roi !");
+                        saisie = sc.nextLine();
+                    }
                 }
+                else break;
             }
             else {
                 System.out.println("Le format de la saisie est incorrect !");
                 saisie = sc.nextLine();
             }
         }
-        while (!formatValide || roiEnEchec);
+        while (true);
 
         fe.jouer(ySrc, xSrc, yDest, xDest);
     }

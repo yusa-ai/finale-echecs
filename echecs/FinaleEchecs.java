@@ -13,6 +13,8 @@ public class FinaleEchecs {
 
     private IJoueur courant;
 
+    private String coupIA; // pour affichage
+
     public FinaleEchecs(IFabriquePièce fPièce, IFabriqueJoueur fJoueur, int mode) {
         switch (mode) {
             case 2:
@@ -30,7 +32,7 @@ public class FinaleEchecs {
         courant = blanc;
 
         pièces.add(fPièce.getPièce("ROI", noir, toY('e'), toX('8')));
-        pièces.add(fPièce.getPièce("TOUR", blanc, toY('b'), toX('7')));
+        pièces.add(fPièce.getPièce("TOUR", blanc, toY('f'), toX('6')));
         pièces.add(fPièce.getPièce("ROI", blanc, toY('e'), toX('6')));
         pièces.add(fPièce.getPièce("TOUR", noir, toY('h'), toX('6')));
 
@@ -80,7 +82,8 @@ public class FinaleEchecs {
             // le roi ne doit pas être en échec à la position d'arrivée
             return !échecSurPosition(yDest, xDest);
 
-        return true;
+        // Le déplacement de la pièce ne peut pas mettre le roi en échec
+        return !coupExposeRoi(ySrc, xSrc, yDest, xDest);
     }
 
     private boolean alliéSurCase(int yDest, int xDest) {
@@ -115,23 +118,32 @@ public class FinaleEchecs {
     public boolean coupDébloqueRoi(int ySrc, int xSrc, int yDest, int xDest) {
         IPièce pièce = occupante(ySrc, xSrc);
 
+            //ne pièce peut en manger une autre pour libérer le roi
+        IPièce pièceSurDest = occupante(yDest, xDest);
+        if (pièceSurDest != null)
+            pièceSurDest.déplacer(-1, -1); // hors de l'échiquier
+
         pièce.déplacer(yDest, xDest); // On simule le déplacement de la pièce pour savoir
         // si celle-ci débloque le roi
         boolean coupDébloqueRoi = !roiEnEchec();
-        pièce.déplacer(ySrc, xSrc);
 
+        // Restauration de l'état du jeu
+        pièce.déplacer(ySrc, xSrc);
+        if (pièceSurDest != null)
+            pièceSurDest.déplacer(yDest, xDest);
         return coupDébloqueRoi;
     }
 
+    public boolean coupExposeRoi(int ySrc, int xSrc, int yDest, int xDest) {
+        return !coupDébloqueRoi(ySrc, xSrc, yDest, xDest);
+    }
+
     public void jouer(int ySrc, int xSrc, int yDest, int xDest) {
-        // S'il y a une pièce (adverse) à la destination, la retirer du plateau (elle est mangée)
+        // S'il y a une pièce (adverse) à la destination, la retirer du plateau : elle est mangée
         pièces.removeIf(pièce -> pièce.getY() == yDest && pièce.getX() == xDest);
 
-        for (IPièce pièce : pièces) {
-            // Déplacer la pièce à la case de départ sur la case d'arrivée
-            if (pièce.getY() == ySrc && pièce.getX() == xSrc)
-                pièce.déplacer(yDest, xDest);
-        }
+        IPièce pièceJouée = occupante(ySrc, xSrc);
+        pièceJouée.déplacer(yDest, xDest);
     }
 
     public IPièce occupante(int y, int x)  {
@@ -177,10 +189,14 @@ public class FinaleEchecs {
                 if (y == ry && x == rx)
                     continue;
 
-                if (!échecSurPosition(y, x))
+                roi.déplacer(y, x); // simulation
+                if (!échecSurPosition(y, x)) {
+                    roi.déplacer(ry, rx); // on replace le roi à sa position initiale
                     return false;
+                }
             }
         }
+        roi.déplacer(ry, rx);
 
         // Le roi est bloqué : on regarde si les autres pièces peuvent le protéger
         for (IPièce pièce : pièces)
@@ -224,19 +240,19 @@ public class FinaleEchecs {
             choix = piècesIA.get(position);
             piècesIA.remove(position);
 
+            // On va tester chacune des coords de l'échiquier dans un ordre aléatoire
             coords = new ArrayList<>();
             for (int i = 0; i < LONGUEUR; ++i)
-                for (int j = 0; j < LONGUEUR; ++j)
+                for (int j = 0; j < LONGUEUR; ++j) {
+                    if (choix.getY() == i && choix.getX() == j) continue; // position actuelle
                     coords.add(new Pair<>(i, j));
+                }
             Collections.shuffle(coords);
-            // On va tester chacune des coords de l'échiquier dans un ordre aléatoire
+
             while (!coords.isEmpty()) {
                 yDest = coords.get(0).getKey();
                 xDest = coords.get(0).getValue();
                 coords.remove(0);
-
-                // Surplace
-                if (choix.getY() == yDest && choix.getX() == xDest) continue;
 
                 // Pièce alliée sur la destination
                 pièceSurDest = occupante(yDest, xDest);
@@ -247,10 +263,16 @@ public class FinaleEchecs {
                     // Le roi ne peut pas se mettre en échec
                     if (choix.craintEchec() && échecSurPosition(yDest, xDest)) continue;
 
-                    if (!roiEnEchec() || // si le roi n'est pas en échec
+                    // Une autre pièce ne peut pas mettre en échec le roi
+                    if (!choix.craintEchec() && coupExposeRoi(choix.getY(), choix.getX(), yDest, xDest)) continue;
+
+                    if (!roiEnEchec() // si le roi n'est pas en échec
                             // ou si le roi est en échec mais que le coup le débloque
-                            roiEnEchec() && coupDébloqueRoi(choix.getY(), choix.getX(), yDest, xDest)) {
-                        System.out.println("(" + choix.getY() + "," + choix.getX() + ") -> (" + yDest + "," + xDest + ")"); // TODO remove ou implémenter d'une autre manière
+                            || roiEnEchec() && coupDébloqueRoi(choix.getY(), choix.getX(), yDest, xDest)) {
+
+                        // pour affichage dans le main
+                        coupIA = toLettre(choix.getY()) + Integer.toString(choix.getX() + 1)
+                                + toLettre(yDest) + (xDest + 1);
 
                         jouer(choix.getY(), choix.getX(), yDest, xDest);
                         return;
@@ -275,6 +297,12 @@ public class FinaleEchecs {
         return Character.getNumericValue(chiffre) - 1;
     }
 
+    public static char toLettre(int y) {
+        final List<Character> LETTRES =
+                new ArrayList<>(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'));
+        return LETTRES.get(y);
+    }
+
     public IJoueur getCourant() {
         return courant;
     }
@@ -283,6 +311,10 @@ public class FinaleEchecs {
         if (courant == blanc)
             return noir;
         return blanc;
+    }
+
+    public String getCoupIA() {
+        return coupIA;
     }
 
     @Override

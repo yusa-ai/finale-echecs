@@ -1,20 +1,23 @@
 package joueurs;
 
+import echecs.FinaleEchecs;
 import echecs.IJoueur;
 
-public class Joueur implements IJoueur {
+class Joueur implements IJoueur {
 
     private final CouleurJoueur couleur;
-    private final TypeJoueur type;
 
-    public Joueur(CouleurJoueur couleur, TypeJoueur type) {
+    Joueur(CouleurJoueur couleur) {
         this.couleur = couleur;
-        this.type = type;
+    }
+
+    @Override
+    public void jouer(FinaleEchecs finaleEchecs) {
     }
 
     @Override
     public boolean estHumain() {
-        return type == TypeJoueur.HUMAIN;
+        return true;
     }
 
     @Override

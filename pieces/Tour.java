@@ -4,7 +4,7 @@ import echecs.FinaleEchecs;
 import echecs.IJoueur;
 import echecs.IPièce;
 
-public class Tour extends Pièce {
+class Tour extends Pièce {
     private static final String SYMBOLE = "T";
 
     public Tour(IJoueur joueur, int y, int x) {

@@ -5,7 +5,7 @@ import echecs.IJoueur;
 import joueurs.CouleurJoueur;
 import echecs.IPièce;
 
-public abstract class Pièce implements IPièce {
+abstract class Pièce implements IPièce {
 
     private final IJoueur joueur;
     private int x;

@@ -3,7 +3,7 @@ package pieces;
 import echecs.FinaleEchecs;
 import echecs.IJoueur;
 
-public class Roi extends Pièce {
+class Roi extends Pièce {
     private static final String SYMBOLE = "R";
 
     public Roi(IJoueur joueur, int y, int x) {

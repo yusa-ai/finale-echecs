@@ -3,6 +3,8 @@ package echecs;
 import joueurs.CouleurJoueur;
 
 public interface IJoueur {
-    public CouleurJoueur getCouleur();
+    CouleurJoueur getCouleur();
     boolean estHumain();
+
+    void jouer(FinaleEchecs finaleEchecs);
 }

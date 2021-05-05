@@ -103,7 +103,7 @@ public class Application {
     }
 
     private static void jouerHumain(FinaleEchecs fe, Scanner sc, String saisie) {
-        int ySrc = 0, xSrc = 0, yDest = 0, xDest = 0;
+        int ySrc, xSrc, yDest, xDest;
         do {
             if (FinaleEchecs.formatValide(saisie)) {
                 String s = saisie.toLowerCase();
@@ -115,16 +115,6 @@ public class Application {
                 if (!fe.coupLégal(ySrc, xSrc, yDest, xDest)) {
                     System.out.println("Le coup est illégal !");
                     saisie = sc.nextLine();
-                }
-
-                // Si le coup est légal et que le roi est en échec
-                else if (fe.roiEnEchec()) {
-                    if (fe.coupDébloqueRoi(ySrc, xSrc, yDest, xDest))
-                        break;
-                    else {
-                        System.out.println("Vous devez absolument débloquer votre roi !");
-                        saisie = sc.nextLine();
-                    }
                 }
                 else break;
             }

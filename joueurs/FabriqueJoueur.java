@@ -15,9 +15,9 @@ public class FabriqueJoueur implements IFabriqueJoueur {
             c = CouleurJoueur.NOIR;
 
         if (type.equalsIgnoreCase("HUMAIN"))
-            return new Joueur(c, TypeJoueur.HUMAIN);
+            return new Joueur(c);
         else if (type.equalsIgnoreCase("IA"))
-            return new Joueur(c, TypeJoueur.IA);
+            return new IA(c);
         return null;
     }
 }

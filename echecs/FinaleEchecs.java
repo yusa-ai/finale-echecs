@@ -1,10 +1,9 @@
 package echecs;
 
-import javafx.util.Pair;
 import java.util.*;
 
 public class FinaleEchecs {
-    private static final int LONGUEUR = 8;
+    public static final int LONGUEUR = 8;
 
     private final List<IPièce> pièces = new ArrayList<>();
 
@@ -35,10 +34,6 @@ public class FinaleEchecs {
         pièces.add(fPièce.getPièce("TOUR", blanc, toY('f'), toX('6')));
         pièces.add(fPièce.getPièce("ROI", blanc, toY('e'), toX('6')));
         pièces.add(fPièce.getPièce("TOUR", noir, toY('h'), toX('6')));
-
-        /*pièces.add(fPièce.getPièce("roi", noir, toY('a'), toX('8')));
-        pièces.add(fPièce.getPièce("roi", blanc, toY('a'), toX('6')));
-        pièces.add(fPièce.getPièce("tour", blanc, toY('b'), toX('6')));*/ // b6 pour pat, c8 pour mat
     }
 
     public static boolean formatValide(String saisie) {
@@ -82,6 +77,10 @@ public class FinaleEchecs {
             // le roi ne doit pas être en échec à la position d'arrivée
             return !échecSurPosition(yDest, xDest);
 
+        // Si le coup semble légal mais que le roi est en échec
+        if (roiEnEchec())
+            return coupDébloqueRoi(ySrc, xSrc, yDest, xDest);
+
         // Le déplacement de la pièce ne peut pas mettre le roi en échec
         return !coupExposeRoi(ySrc, xSrc, yDest, xDest);
     }
@@ -104,7 +103,7 @@ public class FinaleEchecs {
         return null;
     }
 
-    private boolean échecSurPosition(int y, int x) {
+    public boolean échecSurPosition(int y, int x) {
         for (IPièce p : pièces)
             if (p.getJoueur() != getCourant()) {
                 if (p.peutAllerEn(y, x, this) &&
@@ -139,11 +138,19 @@ public class FinaleEchecs {
     }
 
     public void jouer(int ySrc, int xSrc, int yDest, int xDest) {
-        // S'il y a une pièce (adverse) à la destination, la retirer du plateau : elle est mangée
-        pièces.removeIf(pièce -> pièce.getY() == yDest && pièce.getX() == xDest);
+        // pour affichage dans le main
+        if (!courant.estHumain()) {
+            coupIA = toLettre(ySrc) + Integer.toString(xSrc + 1)
+                    + toLettre(yDest) + (xDest + 1);
+        }
 
-        IPièce pièceJouée = occupante(ySrc, xSrc);
-        pièceJouée.déplacer(yDest, xDest);
+        if (coupLégal(ySrc, xSrc, yDest, xDest)) {
+            // S'il y a une pièce (adverse) à la destination, la retirer du plateau : elle est mangée
+            pièces.removeIf(pièce -> pièce.getY() == yDest && pièce.getX() == xDest);
+
+            IPièce pièceJouée = occupante(ySrc, xSrc);
+            pièceJouée.déplacer(yDest, xDest);
+        }
     }
 
     public IPièce occupante(int y, int x)  {
@@ -219,67 +226,15 @@ public class FinaleEchecs {
 
     public void jouerIA() {
         assert !courant.estHumain() : "Le joueur courant est humain.";
+        courant.jouer(this);
+    }
 
-        Random r = new Random();
-        List<IPièce> piècesIA = new ArrayList<>();
-        for (IPièce pièce : pièces) // on récupère les pièces de l'IA
+    public List<IPièce> piècesJoueur() {
+        List<IPièce> piècesJoueur = new ArrayList<>();
+        for (IPièce pièce : pièces)
             if (pièce.getJoueur() == courant)
-                piècesIA.add(pièce);
-
-        int position;
-        IPièce choix;
-
-        List<Pair<Integer, Integer>> coords;
-
-        int yDest, xDest;
-        IPièce pièceSurDest;
-
-        while (true) {
-            // On prend une pièce au hasard, qu'on va essayer de jouer
-            position = r.nextInt(piècesIA.size());
-            choix = piècesIA.get(position);
-            piècesIA.remove(position);
-
-            // On va tester chacune des coords de l'échiquier dans un ordre aléatoire
-            coords = new ArrayList<>();
-            for (int i = 0; i < LONGUEUR; ++i)
-                for (int j = 0; j < LONGUEUR; ++j) {
-                    if (choix.getY() == i && choix.getX() == j) continue; // position actuelle
-                    coords.add(new Pair<>(i, j));
-                }
-            Collections.shuffle(coords);
-
-            while (!coords.isEmpty()) {
-                yDest = coords.get(0).getKey();
-                xDest = coords.get(0).getValue();
-                coords.remove(0);
-
-                // Pièce alliée sur la destination
-                pièceSurDest = occupante(yDest, xDest);
-                if (pièceSurDest != null && pièceSurDest.getJoueur() == courant) continue;
-
-                if (choix.peutAllerEn(yDest, xDest, this) && choix.trajectoireLibre(yDest, xDest, this)) {
-
-                    // Le roi ne peut pas se mettre en échec
-                    if (choix.craintEchec() && échecSurPosition(yDest, xDest)) continue;
-
-                    // Une autre pièce ne peut pas mettre en échec le roi
-                    if (!choix.craintEchec() && coupExposeRoi(choix.getY(), choix.getX(), yDest, xDest)) continue;
-
-                    if (!roiEnEchec() // si le roi n'est pas en échec
-                            // ou si le roi est en échec mais que le coup le débloque
-                            || roiEnEchec() && coupDébloqueRoi(choix.getY(), choix.getX(), yDest, xDest)) {
-
-                        // pour affichage dans le main
-                        coupIA = toLettre(choix.getY()) + Integer.toString(choix.getX() + 1)
-                                + toLettre(yDest) + (xDest + 1);
-
-                        jouer(choix.getY(), choix.getX(), yDest, xDest);
-                        return;
-                    }
-                }
-            }
-        }
+                piècesJoueur.add(pièce);
+        return piècesJoueur;
     }
 
     public boolean contreIA() {
@@ -297,7 +252,7 @@ public class FinaleEchecs {
         return Character.getNumericValue(chiffre) - 1;
     }
 
-    public static char toLettre(int y) {
+    private static char toLettre(int y) {
         final List<Character> LETTRES =
                 new ArrayList<>(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'));
         return LETTRES.get(y);
@@ -314,6 +269,7 @@ public class FinaleEchecs {
     }
 
     public String getCoupIA() {
+        assert contreIA();
         return coupIA;
     }
 

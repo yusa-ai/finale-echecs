@@ -11,10 +11,18 @@ import java.util.Random;
 
 class IA extends Joueur {
 
+	/**
+	 * Initialise une nouvelle IA
+	 * @param couleur La couleur (BLANC/NOIR) de l'IA
+	 */
     IA(CouleurJoueur couleur) {
         super(couleur);
     }
 
+    /**
+     * Fait jouer un coup à l'IA
+     * Cette IA joue un coup valide tiré entièrement au hasard
+     */
     public void jouer(FinaleEchecs fe) {
         Random r = new Random();
         List<IPièce> piècesIA = fe.piècesJoueur();
@@ -39,7 +47,7 @@ class IA extends Joueur {
             for (int i = 0; i < FinaleEchecs.LONGUEUR; ++i)
                 for (int j = 0; j < FinaleEchecs.LONGUEUR; ++j) {
                     if (choix.getY() == i && choix.getX() == j) continue; // position actuelle
-                    if (!choix.peutAllerEn(i, j, fe)) continue;
+                    if (!choix.peutAllerEn(i, j)) continue;
                     coords.add(new Paire<>(i, j));
                 }
             Collections.shuffle(coords);

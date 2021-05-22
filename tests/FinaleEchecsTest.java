@@ -6,7 +6,6 @@ import echecs.FinaleEchecs;
 import joueurs.FabriqueJoueur;
 import pieces.FabriquePièce;
 
-
 class FinaleEchecsTest {
 	
 	@Test
@@ -54,7 +53,7 @@ class FinaleEchecsTest {
 
 	@Test
 	/**
-	 * Test de différent 
+	 * Test des différentes des saisies d'un utilisateur
 	 */
 	void formatValideTest() {
 		assertFalse(FinaleEchecs.formatValide("bonjour je dois faire quoi"));
@@ -66,7 +65,7 @@ class FinaleEchecsTest {
 	
 	@Test
 	/**
-	 * 
+	 * Test de plusieurs coups illégaux
 	 */
 	void coupLégalTest() {
 		FabriquePièce fPièce = new FabriquePièce();

@@ -11,12 +11,22 @@ abstract class Pièce implements IPièce {
     private int x;
     private int y;
 
+    /**
+     * Initialise une nouvelle pièce
+     * @param joueur Le joueur auquel appartient la pièce
+     * @param y La position y de la pièce
+     * @param x La position x de la pièce
+     */
     public Pièce(IJoueur joueur, int y, int x) {
         this.joueur = joueur;
         this.x = x;
         this.y = y;
     }
 
+    /**
+     * Renvoie le symbole de la pièce associé à la pièce
+     * @return Le symbole de la pièce
+     */
     public abstract String getSymbole();
 
     @Override
@@ -46,7 +56,7 @@ abstract class Pièce implements IPièce {
     }
 
     @Override
-    public abstract boolean peutAllerEn(int yDest, int xDest, FinaleEchecs fe);
+    public abstract boolean peutAllerEn(int yDest, int xDest);
 
     @Override
     public abstract boolean trajectoireLibre(int yDest, int xDest, FinaleEchecs fe);

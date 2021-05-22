@@ -4,6 +4,10 @@ import echecs.FinaleEchecs;
 
 class Humain extends Joueur {
 
+	/**
+	 * Initialise un nouveau joueur humain
+	 * @param couleur La couleur (BLANC/NOIR) de l'humain
+	 */
     Humain(CouleurJoueur couleur) {
         super(couleur);
     }

@@ -18,7 +18,8 @@ public class FinaleEchecs {
      * Construit une nouvelle finale d'échecs
      * @param fPièce La fabrique de pièces
      * @param fJoueur La fabrique de joueurs
-     * @param mode Le mode de jeu (1-3)
+     * @param mode Le mode de jeu (2-3 : Humain vs IA, IA vs IA,
+     * Humain vs Humain sinon)
      */
     public FinaleEchecs(IFabriquePièce fPièce, IFabriqueJoueur fJoueur, int mode) {
         switch (mode) {
@@ -57,11 +58,11 @@ public class FinaleEchecs {
 
     /**
      * Détermine si un coup est légal
-     * @param ySrc La coordonnée y de départ
-     * @param xSrc La coordonnée x de départ
-     * @param yDest La coordonnée y d'arrivée
-     * @param xDest La coordonnée x d'arrivée
-     * @return
+     * @param ySrc La position y de départ
+     * @param xSrc La position x de départ
+     * @param yDest La position y d'arrivée
+     * @param xDest La position x d'arrivée
+     * @return vrai/faux
      */
     public boolean coupLégal(int ySrc, int xSrc, int yDest, int xDest) {
         // La destination se trouve dans l'échiquier
@@ -86,7 +87,7 @@ public class FinaleEchecs {
             return false;
 
         // La pièce peut se déplacer à la destination
-        if (!pièce.peutAllerEn(yDest, xDest, this))
+        if (!pièce.peutAllerEn(yDest, xDest))
             return false;
         if (!pièce.trajectoireLibre(yDest, xDest, this))
             return false;
@@ -109,6 +110,10 @@ public class FinaleEchecs {
         return (pièce != null && pièce.getJoueur() == getCourant());
     }
 
+    /**
+     * Détermine si le roi du joueur courant est en échec
+     * @return vrai/faux
+     */
     public boolean roiEnEchec() {
         IPièce roi = roiCourant();
         assert roi != null;
@@ -122,10 +127,17 @@ public class FinaleEchecs {
         return null;
     }
 
+    /**
+     * Détermine si une pièce adverse peut se rendre sur la position passée
+     * en paramètre
+     * @param y La position y de destination
+     * @param x La position x de destination
+     * @return vrai/faux
+     */
     public boolean échecSurPosition(int y, int x) {
         for (IPièce p : pièces)
             if (p.getJoueur() != getCourant()) {
-                if (p.peutAllerEn(y, x, this) &&
+                if (p.peutAllerEn(y, x) &&
                         p.trajectoireLibre(y, x, this) &&
                         !(p.getY() == y && p.getX() == x))
                     return true;
@@ -133,6 +145,14 @@ public class FinaleEchecs {
         return false;
     }
 
+    /**
+     * Détermine si un déplacement de pièce peut débloquer le roi de son échec
+     * @param ySrc La position y de départ
+     * @param xSrc La position x de départ
+     * @param yDest La position y d'arrivée
+     * @param xDest La c oordonnée x d'arrivée
+     * @return vrai/faux
+     */
     public boolean coupDébloqueRoi(int ySrc, int xSrc, int yDest, int xDest) {
         IPièce pièce = occupante(ySrc, xSrc);
 
@@ -151,11 +171,17 @@ public class FinaleEchecs {
             pièceSurDest.déplacer(yDest, xDest);
         return coupDébloqueRoi;
     }
-
     public boolean coupExposeRoi(int ySrc, int xSrc, int yDest, int xDest) {
         return !coupDébloqueRoi(ySrc, xSrc, yDest, xDest);
     }
 
+    /**
+     * Joue un coup après avoir vérifié sa légalité et passe au tour suivant
+     * @param ySrc La position y de départ
+     * @param xSrc La position x de départ
+     * @param yDest La position y d'arrivée
+     * @param xDest La position x d'arrivée
+     */
     public void jouer(int ySrc, int xSrc, int yDest, int xDest) {
         // pour affichage dans le main
         if (!courant.estHumain()) {
@@ -174,6 +200,12 @@ public class FinaleEchecs {
         prochainTour();
     }
 
+    /**
+     * 
+     * @param y La position y de la pièce testé
+     * @param x La position x de la pièce testé
+     * @return  la pièce / null
+     */
     public IPièce occupante(int y, int x)  {
         for (IPièce pièce : pièces)
             if (pièce.getY() == y && pièce.getX() == x)
@@ -188,6 +220,11 @@ public class FinaleEchecs {
             courant = blanc;
     }
 
+    /**
+     * Détermine s'il ne reste que les deux Rois de chaque joueur
+     * (matériel insuffisant)
+     * @return vrai/faux
+     */
     public boolean nulle() {
         final int NB_ROIS = 2;
         if (pièces.size() == NB_ROIS) {
@@ -202,6 +239,10 @@ public class FinaleEchecs {
         return true;
     }
 
+    /**
+     * Détermine s'il y a pat
+     * @return vrai/faux
+     */
     public boolean pat() {
         IPièce roi = roiCourant();
         assert roi != null;
@@ -217,7 +258,8 @@ public class FinaleEchecs {
                 if (y == ry && x == rx)
                     continue;
 
-                roi.déplacer(y, x); // simulation
+                roi.déplacer(y, x); // simulation du déplacement
+                // on a trouvé une case sur laquelle le roi n'est pas en échec
                 if (!échecSurPosition(y, x)) {
                     roi.déplacer(ry, rx); // on replace le roi à sa position initiale
                     return false;
@@ -232,7 +274,7 @@ public class FinaleEchecs {
                 // On essaie de déplacer chaque autre pièce du joueur sur toutes les cases de l'échiquier
                 for (int y = 0; y < LONGUEUR; ++y)
                     for (int x = 0; x < LONGUEUR; ++x) {
-                        if (pièce.peutAllerEn(y, x, this) && pièce.trajectoireLibre(y, x, this))
+                        if (pièce.peutAllerEn(y, x) && pièce.trajectoireLibre(y, x, this))
                             if (coupDébloqueRoi(pièce.getY(), pièce.getX(), y, x))
                                 return false;
                     }
@@ -241,15 +283,26 @@ public class FinaleEchecs {
         return true;
     }
 
+    /**
+     * Détermine s'il y a échec et mat
+     * @return vrai/faux
+     */
     public boolean mat() {
         return pat() && roiEnEchec();
     }
 
+    /**
+     * Fait jouer un coup à l'intelligence artificielle
+     */
     public void jouerIA() {
         assert !courant.estHumain() : "Le joueur courant est humain.";
         courant.jouer(this);
     }
 
+    /**
+     * Renvoie la liste des pièces du joueur courant
+     * @return la liste des pièces du joueur courant
+     */
     public List<IPièce> piècesJoueur() {
         List<IPièce> piècesJoueur = new ArrayList<>();
         for (IPièce pièce : pièces)
@@ -258,10 +311,19 @@ public class FinaleEchecs {
         return piècesJoueur;
     }
 
+    /**
+     * Détermine si le joueur blanc joue contre une IA (mode 2 ou 3)
+     * @return
+     */
     public boolean contreIA() {
         return !noir.estHumain();
     }
 
+    /**
+     * Renvoie l'index dans le tableau représentant l'échiquier correspondant à la lettre saisie
+     * @param lettre
+     * @return l'index correspondant à la lettre
+     */
     public static int toY(char lettre) {
         final List<Character> LETTRES =
                 new ArrayList<>(Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'));
@@ -269,6 +331,11 @@ public class FinaleEchecs {
         return LETTRES.indexOf(lettre);
     }
 
+    /**
+     * Renvoie l'index dans le tableau représentant l'échiquier correspondant au chiffre saisie
+     * @param chiffre
+     * @return l'index correspondant au chiffre
+     */
     public static int toX(char chiffre) {
         return Character.getNumericValue(chiffre) - 1;
     }
@@ -279,16 +346,28 @@ public class FinaleEchecs {
         return LETTRES.get(y);
     }
 
+    /**
+     * Renvoie le joueur courant de la partie
+     * @return Le joueur courant
+     */
     public IJoueur getCourant() {
         return courant;
     }
 
+    /**
+     * Renvoie le joueur du tour précédent
+     * @return Le joueur précédent
+     */
     public IJoueur getPrécédent() {
         if (courant == blanc)
             return noir;
         return blanc;
     }
 
+    /**
+     * Renvoie le coup joué par l'IA sous la forme d'une chaîne de caractères
+     * @return Le coup joué par l'IA
+     */
     public String getCoupIA() {
         assert contreIA();
         return coupIA;

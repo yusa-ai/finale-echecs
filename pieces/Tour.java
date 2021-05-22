@@ -7,12 +7,18 @@ import echecs.IPièce;
 class Tour extends Pièce {
     private static final String SYMBOLE = "T";
 
+    /**
+     * Initialise une nouvelle Tour
+     * @param joueur Le joueur auquel appartient la tour
+     * @param y La position y de la tour
+     * @param x La position x de la tour
+     */
     public Tour(IJoueur joueur, int y, int x) {
         super(joueur, y, x);
     }
 
     @Override
-    public boolean peutAllerEn(int yDest, int xDest, FinaleEchecs fe) {
+    public boolean peutAllerEn(int yDest, int xDest) {
         // Déplacement en ligne OU en colonne
         return !(yDest != getY() && xDest != getX());
     }

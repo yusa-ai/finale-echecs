@@ -4,7 +4,7 @@ import echecs.FinaleEchecs;
 import echecs.IJoueur;
 import echecs.IPièce;
 
-class Tour extends Pièce {
+public class Tour extends Pièce {
     private static final String SYMBOLE = "T";
 
     /**

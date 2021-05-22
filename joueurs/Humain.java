@@ -2,13 +2,13 @@ package joueurs;
 
 import echecs.FinaleEchecs;
 
-class Humain extends Joueur {
+public class Humain extends Joueur {
 
 	/**
 	 * Initialise un nouveau joueur humain
 	 * @param couleur La couleur (BLANC/NOIR) de l'humain
 	 */
-    Humain(CouleurJoueur couleur) {
+    public Humain(CouleurJoueur couleur) {
         super(couleur);
     }
 

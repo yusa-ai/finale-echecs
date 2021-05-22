@@ -9,13 +9,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-class IA extends Joueur {
+public class IA extends Joueur {
 
 	/**
 	 * Initialise une nouvelle IA
 	 * @param couleur La couleur (BLANC/NOIR) de l'IA
 	 */
-    IA(CouleurJoueur couleur) {
+    public IA(CouleurJoueur couleur) {
         super(couleur);
     }
 

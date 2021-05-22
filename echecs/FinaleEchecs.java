@@ -14,6 +14,12 @@ public class FinaleEchecs {
 
     private String coupIA; // pour affichage
 
+    /**
+     * Construit une nouvelle finale d'échecs
+     * @param fPièce La fabrique de pièces
+     * @param fJoueur La fabrique de joueurs
+     * @param mode Le mode de jeu (1-3)
+     */
     public FinaleEchecs(IFabriquePièce fPièce, IFabriqueJoueur fJoueur, int mode) {
         switch (mode) {
             case 2:
@@ -36,14 +42,27 @@ public class FinaleEchecs {
         pièces.add(fPièce.getPièce("TOUR", noir, toY('h'), toX('6')));
     }
 
+    /**
+     * Détermine si une saisie est au bon format
+     * @param saisie La saisie à vérifier
+     * @return vrai/faux
+     */
     public static boolean formatValide(String saisie) {
         final int TAILLE = 4;
-        // REGEX: Sans tenir compte de la casse, une lettre de A à H puis un chiffre de 1 à 8, deux fois
+        // REGEX : Sans tenir compte de la casse, une lettre de A à H puis un chiffre de 1 à 8, deux fois
         final String FORMAT = "(?i)([a-h][1-8]){2}";
 
         return (saisie.length() == TAILLE && saisie.matches(FORMAT));
     }
 
+    /**
+     * Détermine si un coup est légal
+     * @param ySrc La coordonnée y de départ
+     * @param xSrc La coordonnée x de départ
+     * @param yDest La coordonnée y d'arrivée
+     * @param xDest La coordonnée x d'arrivée
+     * @return
+     */
     public boolean coupLégal(int ySrc, int xSrc, int yDest, int xDest) {
         // La destination se trouve dans l'échiquier
         if (yDest < 0 || xDest < 0 || yDest > LONGUEUR - 1 || xDest > LONGUEUR - 1)
@@ -117,7 +136,7 @@ public class FinaleEchecs {
     public boolean coupDébloqueRoi(int ySrc, int xSrc, int yDest, int xDest) {
         IPièce pièce = occupante(ySrc, xSrc);
 
-            //ne pièce peut en manger une autre pour libérer le roi
+        // Une pièce peut en manger une autre pour libérer le roi
         IPièce pièceSurDest = occupante(yDest, xDest);
         if (pièceSurDest != null)
             pièceSurDest.déplacer(-1, -1); // hors de l'échiquier
@@ -151,6 +170,8 @@ public class FinaleEchecs {
             IPièce pièceJouée = occupante(ySrc, xSrc);
             pièceJouée.déplacer(yDest, xDest);
         }
+        
+        prochainTour();
     }
 
     public IPièce occupante(int y, int x)  {
@@ -160,7 +181,7 @@ public class FinaleEchecs {
         return null;
     }
 
-    public void prochainTour() {
+    private void prochainTour() {
         if (courant == blanc)
             courant = noir;
         else

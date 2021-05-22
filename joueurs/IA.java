@@ -2,7 +2,7 @@ package joueurs;
 
 import echecs.FinaleEchecs;
 import echecs.IPièce;
-import javafx.util.Pair;
+import utils.Paire;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +22,7 @@ class IA extends Joueur {
         int position;
         IPièce choix;
 
-        List<Pair<Integer, Integer>> coords;
+        List<Paire<Integer>> coords;
 
         int yDest, xDest;
         IPièce pièceSurDest;
@@ -40,13 +40,13 @@ class IA extends Joueur {
                 for (int j = 0; j < FinaleEchecs.LONGUEUR; ++j) {
                     if (choix.getY() == i && choix.getX() == j) continue; // position actuelle
                     if (!choix.peutAllerEn(i, j, fe)) continue;
-                    coords.add(new Pair<>(i, j));
+                    coords.add(new Paire<>(i, j));
                 }
             Collections.shuffle(coords);
 
             while (!coords.isEmpty()) {
-                yDest = coords.get(0).getKey();
-                xDest = coords.get(0).getValue();
+                yDest = coords.get(0).getX();
+                xDest = coords.get(0).getY();
                 coords.remove(0);
 
                 // Pièce alliée sur la destination

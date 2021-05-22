@@ -61,8 +61,6 @@ public class Application {
                 fe.jouerIA();
                 System.out.println(fe.getCoupIA());
             }
-
-            fe.prochainTour();
         }
         sc.close();
     }

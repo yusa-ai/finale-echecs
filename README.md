@@ -1,6 +1,8 @@
-![echecs][chess.svg]
+![echecs](chess.svg)
 
 # Finale d'échecs
+
+![GitHub top language](https://img.shields.io/github/languages/top/yusa-ai/bpo-d)
 
 Ce repo contient le code source d'une implémentation simple d'une finale d'échecs (pièces élémentaires) pouvant être disputée avec 3 modes :
 * Joueur contre Joueur
@@ -10,25 +12,17 @@ Ce repo contient le code source d'une implémentation simple d'une finale d'éch
 ## Enjeux
 
 Ce projet a été réalisé en 1ère année de DUT Informatique à l'IUT de Paris - Rives de Seine.  
-Son objectif porte sur l'emploi habile des spécificités du langage Java, à savoir travailler sur les questions d'héritage, de polymorphisme, 
-de délégation notamment.
+Son objectif porte sur l'emploi habile des spécificités du langage Java, à savoir travailler sur les questions d'héritage, de polymorphisme et de délégation. 
 
-## Synopsis
+## Énoncé
 
-Introduction (Mikal Ziane) :
-> Au jeu d'échecs, si la partie ne s’est pas terminée plus tôt, trois phases se succèdent : l’ouverture où
-les pièces sont développées, le milieu de jeu où les rois restent typiquement à l'abri et la finale où les rois
-deviennent actifs.  
-Dans les finales les plus simples, il ne reste que très peu de pièces en plus des deux rois. 
-Il s’agit alors pour le camp le plus fort de mater le roi ennemi. Les débutants apprennent notamment à jouer
-avec roi et tour contre roi ou roi et dame contre roi ou bien roi et dame contre roi et tour etc.  
-
-Le sujet complet de ce projet ainsi que ses consignes peuvent être consultées depuis [ce document](projet echecs.pdf).
+Le sujet complet de ce projet ainsi que ses consignes peuvent être consultées depuis [ce document](projet_echecs.pdf) (auteur : Mikal Ziane).
 
 ## Membres de l'équipe
 
-* HAN Laurent (groupe 10X)
-* MALONZO Ryan (groupe 101)
+* HAN Laurent
+* MALONZO Ryan
 
-IUT Paris - Rives de Seine, année 2020 - 2021, semestre 2, période D
+Groupes 101, 10X (semestre 2)  
+Projet BPO2 2020 - 2021 à l'IUT de Paris - Rives de Seine
 

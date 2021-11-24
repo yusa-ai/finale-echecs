@@ -9,6 +9,8 @@ Ce repo contient le code source d'une implémentation simple d'une finale d'éch
 * Joueur contre IA
 * IA contre IA (partie automatique)
 
+Les scénarios de fin de partie ayant été développés sont le pat, le mat et la nulle.
+
 ## Enjeux
 
 Ce projet a été réalisé en 1ère année de DUT Informatique à l'IUT de Paris - Rives de Seine.  
@@ -23,6 +25,6 @@ Le sujet complet de ce projet ainsi que ses consignes peuvent être consultées 
 * HAN Laurent
 * MALONZO Ryan
 
-Groupes 101, 10X (semestre 2)  
+Groupes 101, 102 (semestre 2)  
 Projet BPO2 2020 - 2021 à l'IUT de Paris - Rives de Seine
 
